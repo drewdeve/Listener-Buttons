@@ -1,7 +1,7 @@
 from time import sleep
 from jnius import autoclass
 
-Hardware = autoclass('путь к вашему приложению, где лежит Hardware')
+Hardware = autoclass('org.yourapp.Hardware') //Путь к файлу Hardware
 
 
 #активировать акселерометр
