@@ -1,41 +1,54 @@
-package org.yourapp; //надо этот файл закинуть в эту папку
+package org.yourapp;
 
 import org.renpy.android.PythonActivity;
 import android.content.Context;
-import android.hardware.Sensor;
-import android.hardware.SensorEvent;
-import android.hardware.SensorEventListener;
-import android.hardware.SensorManager;
+import android.hardware.Key;
+import android.hardware.KeyEvent;
+import android.hardware.KeyListener;
+import android.hardware.KeyEventDispatcher;
 
 
 public class Hardware {
-    // храним последнее событие, которое мы получили от пользователя
-    static public SensorEvent lastEvent = null;
 
-    // Определяем нового пользователя
-    static class AccelListener implements SensorEventListener {
-        public void onSensorChanged(SensorEvent ev) {
-            lastEvent = ev;
+    KeyEvent keyEvt = KeyEventRecorder.getLastEvent();
+
+    private class KeyEventRecorder implements KeyEventDispatcher { 
+        private static KeyEvent lastEvent;
+        private static KeyEventRecorder myInstance;
+
+        private KeyEventRecorder() {
+            super();
         }
-        public void onAccuracyChanged(Sensor sensor, int accuracy) {
+
+        public static synchronized KeyEventRecorder getInstance() {
+            if ( myInstance == null )
+                myInstance = new KeyEventRecorder();
+            return myInstance;
+        }
+
+        public static KeyEvent getLastEvent() {
+            return lastEvent;
+        }
+        public boolean dispatchKeyEvent(KeyEvent event) {
+            lastEvent = event;
+            if (event.getAction() == KeyEvent.ACTION_DOWN) {
+                switch (event.getKeyCode()) {
+                case KeyEvent.KEYCODE_VOLUME_DOWN:
+                    return true;
+                        
+                case KeyEvent.KEYCODE_VOLUME_UP:
+                    return true;
+                        
+                case KeyEvent.KEYCODE_HOME:
+                    return true
+    
+                case KeyEvent.KEYCODE_BACK:
+                    return true
+                }
+                        
+            } return false
+            return super.dispatchKeyEvent(event);
         }
     }
-
-    // Создаем нашего пользователя
-    static AccelListener accelListener = new AccelListener();
-
-    // Метод включения/отключения акселерометра сервис и пользователь
-    static void accelerometerEnable(boolean enable) {
-        Context context = (Context) PythonActivity.mActivity;
-        SensorManager sm = (SensorManager) context.getSystemService(Context.SENSOR_SERVICE);
-        Sensor accel = sm.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
-
-        if (accel == null) 
-            return;
-
-        if (enable)
-            sm.registerListener(accelListener, accel, SensorManager.SENSOR_DELAY_GAME);
-        else    
-            sm.unregisterListener(accelListener, accel);
-    }
-}
+     
+} 
